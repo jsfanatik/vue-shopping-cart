@@ -77,7 +77,6 @@
 <script setup>
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
 import { useStore } from '../store';
-// import Catalog from './components/Catalog.vue'
 import {
   TransitionRoot,
   TransitionChild,
@@ -103,6 +102,12 @@ const emit = defineEmits(['closeModal'])
 const closeModal = () => {
   emit('closeModal')
 }
+
+watch(store, () => {
+  if (store.checkBoxItems.length === 0) {
+    emit('closeModal')
+  }
+})
 
 const removeFromCart = (product) => {
   store.checkBoxItems.splice(store.checkBoxItems.indexOf(product), 1)

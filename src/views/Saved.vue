@@ -16,25 +16,24 @@
   </div>
 
   <div v-else class="mx-auto max-w-2xl py-16 px-4 sm:py-12 sm:px-6 lg:max-w-7xl lg:px-8">
-    <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-      <div v-for="item in store.checkBoxItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
+    <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+      <div v-for="item in store.savedItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
         <div class="relative pb-4">
           <TrashIcon class="w-6 h-6"/>
           <!-- <input type="checkbox" :value="item" v-model="checkBoxArray" class="absolute h-6 w-6 pb-8"/> -->
         </div>
         <div class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
-          <img :src="item.image" class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
+          <img :src="item.image" @click="openPreview(item)" class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
         </div>
-        <div class="mt-4 flex justify-between">
-          <div>
-            <h3 class="text-sm text-gray-700">
-              {{ item.title }}
-            </h3>
-          </div>
-          <p class="text-sm font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
+        <div class="relative">
+          <h3 class="mt-4 text-xs text-gray-700">{{ item.title.length > 48 ? item.title.slice(0, 48) + '…' : item.title }}</h3>
+          <p class="mt-1 text-md font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
         </div>
       </div>
     </div>
+
+    <ProductPreview :isPreviewOpen="isPreviewOpen" @closePreview="closePreview" />
+
   </div>
 </template>
 
@@ -44,6 +43,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from '../store';
 import axios from "axios";
 import { TrashIcon } from "@heroicons/vue/outline";
+import ProductPreview from '../components/ProductPreview.vue';
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -54,31 +54,22 @@ const router = useRouter()
 const route = useRoute()
 const store = useStore()
 const storeData = ref([])
-// const checkBoxArray = ref([])
 const subTotal = ref()
-// const loading = ref(false)
+const isPreviewOpen = ref(false)
 
 const emit = defineEmits(['update', 'updateSubTotal'])
+
+const openPreview = (item) => {
+  isPreviewOpen.value = true
+  store.preview = item
+}
+
+const closePreview = () => {
+  isPreviewOpen.value = false
+  store.preview = []
+}
 
 onMounted(() => {
   console.log(store.checkBoxItems)
 })
-
-// watch(checkBoxArray, () => {
-
-//   store.checkBoxItems = [...checkBoxArray.value]
-//   console.log(store.checkBoxItems)
-
-//   // returns a new array containing only price
-//   const storedObjects = checkBoxArray.value.map(elm => {
-//     return elm.price
-//   })
-
-//   store.sumValue(storedObjects)
-// })
-
-// watch(route.params.category, () => {
-//   console.log(route.params.category)
-//   store.getCategory(route.params.category)
-// })
 </script>

@@ -8,6 +8,7 @@ export const useStore = defineStore({
     checkBoxItems: [],
     savedItems: [],
     storeData: [],
+    preview: [],
     subTotal: 0.00,
     loading: false
   }),
@@ -41,6 +42,9 @@ export const useStore = defineStore({
       } catch (error) {
         console.log(error, 'error found!')
       }
+    },
+    addToSaved(item) {
+      this.savedItems.push(item)
     },
     sumValue(storedObjects) {
       const initialValue = 0;
