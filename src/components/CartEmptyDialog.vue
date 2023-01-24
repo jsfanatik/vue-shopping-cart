@@ -33,7 +33,7 @@
                 as="h3"
                 class="text-lg font-medium leading-6 text-gray-900"
               >
-                Your cart is empty!
+                {{ isEmptyMessage }}
               </DialogTitle>
               <div class="mt-2">
                 <p class="text-sm text-gray-500">
@@ -70,8 +70,9 @@ import {
 
 const props = defineProps({
   isEmptyOpen: Boolean,
+  isEmptyMessage: String
 })
-const { isEmptyOpen } = toRefs(props)
+const { isEmptyOpen, isEmptyMessage } = toRefs(props)
 
 const emit = defineEmits(['closeEmptyModal'])
 

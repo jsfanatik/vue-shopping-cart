@@ -29,7 +29,6 @@ export const useStore = defineStore({
           console.log(error, 'error found!')
       }
     },
-
     // load products based on category, 
     async getProductsByCategory(category) {
       try {
