@@ -179,7 +179,7 @@ const close = () => {
 const addToCart = () => {
   store.checkBoxItems.push(store.preview)
 
-  const storedObjects =  store.checkBoxItems.map(elm => {
+  const storedObjects = store.checkBoxItems.map(elm => {
     return elm.price
   })
 

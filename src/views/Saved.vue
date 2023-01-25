@@ -76,8 +76,4 @@ const removeFromSaved = (item) => {
     router.push({ name: 'Catalog', params: { category: "all" } })
   }
 }
-
-onMounted(() => {
-  console.log(store.checkBoxItems)
-})
 </script>

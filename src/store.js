@@ -7,6 +7,7 @@ export const useStore = defineStore({
     category: "",
     checkBoxItems: [],
     savedItems: [],
+    isSaved: false,
     storeData: [],
     preview: [],
     subTotal: 0.00,
@@ -25,9 +26,15 @@ export const useStore = defineStore({
         )
         // res.data.forEach((item) => {
         //   item['saved'] = false
-        //   this.storeData.push(item)
+        //   this.storeData = item
         // })
-        this.storeData = res.data
+        for (let i = 0; i < res.data.length; i++) {
+          res.data[i]['saved'] = false
+          this.storeData = res.data
+          // console.log(this.storeData)
+        }
+        // this.storeData = res.data
+        // console.log(this.storeData)
         this.loading = false
       } catch (error) {
           console.log(error, 'error found!')

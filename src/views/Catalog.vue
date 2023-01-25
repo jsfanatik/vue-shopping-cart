@@ -25,7 +25,7 @@
           <h3 class="mt-4 text-xs text-gray-700">{{ item.title.length > 48 ? item.title.slice(0, 48) + '…' : item.title }}</h3>
           <p class="mt-1 text-md font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
           <div class="absolute bottom-0 right-0">
-            <HeartIcon @click="saveItem(item)" :class="[store.savedItems.saved === true ? 'text-blue-700' : '']" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
+            <HeartIcon @click="saveItem(item)" :class="[item.saved === savedItem ? 'text-red-700' : '']" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
           </div>
         </div>
       </div>
@@ -59,9 +59,11 @@ const router = useRouter()
 const route = useRoute()
 const store = useStore()
 const isPreviewOpen = ref(false)
-
 const isEmptyOpen = ref(false)
 const isEmptyMessage = ref("")
+const newArray = ref([])
+const savedItem = ref()
+// const isActive = ref(false)
 
 const emit = defineEmits(['update', 'updateSubTotal'])
 
@@ -87,19 +89,29 @@ const saveItem = (item) => {
 
   const allItems = []
 
-  // item['saved'] = true
-
   allItems.push(item)
 
   // prevents duplicate items in store.savedItems
   allItems.forEach((val) => {
     if(!store.savedItems.find(e => e.title === val.title)) {
+      val.saved = true
       store.savedItems.unshift(val)
-      console.log(store.savedItems)
     } else {
       isEmptyMessage.value = "You Already Saved this Item!"
       openEmptyModal()
     }
   })
+  store.storeData.find(f => f.title === item.title).saved = true
+
+  savedItem.value = store.savedItems.find(f => f.title === item.title).saved
+
+  store.isSaved = savedItem.value
+  console.log(store.isSaved)
+  // console.log(store.storeData.find(f => f.title === item.title).saved)
 }
+
+onMounted(() => {
+  savedItem.value = store.isSaved
+  // console.log(savedItem.value)
+})
 </script>
