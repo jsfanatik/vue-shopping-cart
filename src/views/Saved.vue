@@ -71,7 +71,6 @@ const closePreview = () => {
 
 const removeFromSaved = (item) => {
   store.savedItems.splice(store.savedItems.indexOf(item), 1)
-  // store.subtractValue([product.price])
   console.log(store.savedItems)
   if (store.savedItems.length === 0) {
     router.push({ name: 'Catalog', params: { category: "all" } })

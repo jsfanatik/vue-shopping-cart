@@ -23,6 +23,10 @@ export const useStore = defineStore({
         const res = await axios.get(
         `https://fakestoreapi.com/products`
         )
+        // res.data.forEach((item) => {
+        //   item['saved'] = false
+        //   this.storeData.push(item)
+        // })
         this.storeData = res.data
         this.loading = false
       } catch (error) {
@@ -42,9 +46,7 @@ export const useStore = defineStore({
         console.log(error, 'error found!')
       }
     },
-    addToSaved(item) {
-      this.savedItems.push(item)
-    },
+    // calculates total value in cart
     sumValue(storedObjects) {
       const initialValue = 0;
       this.subTotal = storedObjects.reduce(
@@ -52,6 +54,7 @@ export const useStore = defineStore({
         initialValue
       );
     },
+    // calculates total value after item is removed from cart
     subtractValue(productPrice) {
       console.log(productPrice)
       const initialValue = this.subTotal;

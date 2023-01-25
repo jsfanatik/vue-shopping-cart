@@ -6,7 +6,6 @@
       <img src="https://static.thenounproject.com/png/91211-200.png" class="h-10 mr-3 sm:h-9" alt="Flowbite Logo" />
       <span class="self-center text-black text-xl font-semibold whitespace-nowrap">HipStore</span>
     </a>
-
     <div class="flex md:order-2 hover:cursor-pointer">
       <div @click="goToSaved" class="flex">
         <HeartIcon class="w-7 h-7" :class="[route.name === 'Saved' ? 'text-blue-700' : '']"/>
@@ -29,13 +28,17 @@
 
   <Cart @closeModal="closeModal" :isOpen="isOpen"/>
 
-  <CartEmpty @closeEmptyModal="closeEmptyModal" :isEmptyOpen="isEmptyOpen" :isEmptyMessage="isEmptyMessage"/>
+  <CartEmpty 
+    @closeEmptyModal="closeEmptyModal" 
+    :isEmptyOpen="isEmptyOpen" 
+    :isEmptyMessage="isEmptyMessage"
+  />
 
   <router-view></router-view>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from './store';
 import { useRoute, useRouter } from "vue-router";
 import { HeartIcon } from "@heroicons/vue/outline";
@@ -45,12 +48,9 @@ import CartEmpty from './components/CartEmptyDialog.vue'
 const store = useStore()
 const router = useRouter();
 const route = useRoute()
-const subTotal = ref(null)
 const isOpen = ref(false)
 const isEmptyOpen = ref(false)
 const isEmptyMessage = ref("")
-const isActive = ref(false)
-// const selectedItem = ref()
 
 const navItems = [
   { name: "All", category: "all"},
@@ -80,15 +80,7 @@ const getProducts = (item) => {
   router.push({ name: 'Catalog', params: { category: item.category } })
 }
 
-// watch for route change, pass route param as argument to store functions
-watch(route, () => {
-  if (route.params.category === 'all') {
-    store.getProducts()
-  } else {
-    store.getProductsByCategory(route.params.category)
-  }
-})
-
+// open sidebar shopping cart
 const openModals = () => {
   if (store.checkBoxItems.length > 0) {
     openModal()
@@ -98,13 +90,24 @@ const openModals = () => {
   }
 }
 
+// route to saved items
 const goToSaved = () => {
   if (store.savedItems.length > 0) {
     router.push({ name: 'Saved' })
   } else {
-    isEmptyMessage.value = "You have no Save Items!"
+    isEmptyMessage.value = "You Have NO Save Items!"
     openEmptyModal()
   }
 }
+
+// watches for route change
+// passes route param as argument to store functions
+watch(route, () => {
+  if (route.params.category === 'all') {
+    store.getProducts()
+  } else {
+    store.getProductsByCategory(route.params.category)
+  }
+})
 </script>
 

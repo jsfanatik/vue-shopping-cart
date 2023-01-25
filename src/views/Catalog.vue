@@ -18,25 +18,24 @@
   <div v-else class="mx-auto max-w-2xl py-16 px-4 sm:py-12 sm:px-6 lg:max-w-7xl lg:px-8">
     <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
       <div v-for="item in store.storeData" :key="item.id" class="group relative shadow-xl bg-gray-200 p-4 rounded-md">
-        <div class="relative h-6 w-6 pb-8">
-          <!-- <HeartIcon class="mr-2 w-7 h-7 mb-8"/> -->
-          <!-- <input type="checkbox" :value="item" v-model="checkBoxArray" class="absolute h-6 w-6 pb-8"/> -->
-        </div>
         <div class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
           <img :src="item.image" @click="openPreview(item)" class="h-full w-full object-cover object-center lg:h-full lg:w-full hover:cursor-pointer" />
-          <!-- <div class="absolute bottom-0 right-0 ...">
-            <HeartIcon class="mr-2 w-7 h-7 mb-2 font-bold text-red-400"/>
-          </div> -->
         </div>
         <div class="relative">
           <h3 class="mt-4 text-xs text-gray-700">{{ item.title.length > 48 ? item.title.slice(0, 48) + '…' : item.title }}</h3>
           <p class="mt-1 text-md font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
           <div class="absolute bottom-0 right-0">
-            <HeartIcon @click="saveItem(item)" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
+            <HeartIcon @click="saveItem(item)" :class="[store.savedItems.saved === true ? 'text-blue-700' : '']" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
           </div>
         </div>
       </div>
     </div>
+
+    <CartEmpty 
+    @closeEmptyModal="closeEmptyModal" 
+    :isEmptyOpen="isEmptyOpen" 
+    :isEmptyMessage="isEmptyMessage"
+  />
 
     <ProductPreview :isPreviewOpen="isPreviewOpen" @closePreview="closePreview" />
   </div>
@@ -47,7 +46,9 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from '../store';
 import ProductPreview from '../components/ProductPreview.vue';
+import CartEmpty from '../components/CartEmptyDialog.vue'
 import { HeartIcon } from "@heroicons/vue/outline";
+import { stringifyExpression } from '@vue/compiler-core';
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -57,10 +58,10 @@ const formatter = new Intl.NumberFormat('en-US', {
 const router = useRouter()
 const route = useRoute()
 const store = useStore()
-const storeData = ref([])
-const checkBoxArray = ref([])
-const subTotal = ref()
 const isPreviewOpen = ref(false)
+
+const isEmptyOpen = ref(false)
+const isEmptyMessage = ref("")
 
 const emit = defineEmits(['update', 'updateSubTotal'])
 
@@ -74,11 +75,31 @@ const closePreview = () => {
   store.preview = []
 }
 
-const saveItem = (item) => {
-  store.addToSaved(item)
+const openEmptyModal = () => {
+  isEmptyOpen.value = true
 }
 
-onMounted(() => {
-  checkBoxArray.value = store.checkBoxItems
-})
+const closeEmptyModal = () => {
+  isEmptyOpen.value = false
+}
+
+const saveItem = (item) => {
+
+  const allItems = []
+
+  // item['saved'] = true
+
+  allItems.push(item)
+
+  // prevents duplicate items in store.savedItems
+  allItems.forEach((val) => {
+    if(!store.savedItems.find(e => e.title === val.title)) {
+      store.savedItems.unshift(val)
+      console.log(store.savedItems)
+    } else {
+      isEmptyMessage.value = "You Already Saved this Item!"
+      openEmptyModal()
+    }
+  })
+}
 </script>
