@@ -136,4 +136,6 @@ watch(route, () => {
     store.getProductsByCategory(route.params.category)
   }
 })
+
+
 </script>

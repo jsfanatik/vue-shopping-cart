@@ -8,6 +8,7 @@ export const useStore = defineStore({
     user: null,
     category: "",
     checkBoxItems: [],
+    topLevelSavedItems: [],
     savedItems: [],
     isSaved: [],
     storeData: [],
@@ -56,9 +57,13 @@ export const useStore = defineStore({
     // retrieve saved items from Supabase database
     async getSavedItems() {
       const { data: workouts, error } = await supabase.from("workouts").select("*");
+      this.topLevelSavedItems = [...workouts]
       const newArray = []
       for (let i = 0; i < workouts.length; i++) {
         newArray.push(workouts[i].savedItems[0])
+        
+        //TODO: push top level "workouts" into newArray
+        // newArray.push(workouts[i])
         this.savedItems = [...newArray]
       }
       console.log(this.savedItems)

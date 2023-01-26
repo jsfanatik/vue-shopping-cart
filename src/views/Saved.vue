@@ -17,9 +17,9 @@
 
   <div v-else class="mx-auto max-w-2xl py-16 px-4 sm:py-12 sm:px-6 lg:max-w-7xl lg:px-8">
     <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-      <div v-for="item in store.savedItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
+      <div v-for="item in store.savedItems.saveItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
         <div class="relative pb-4">
-          <TrashIcon @click="removeFromSaved(item)" class="w-6 h-6 hover:cursor-pointer"/>
+          <TrashIcon @click="deleteSavedProduct(item)" class="w-6 h-6 hover:cursor-pointer"/>
           <!-- <input type="checkbox" :value="item" v-model="checkBoxArray" class="absolute h-6 w-6 pb-8"/> -->
         </div>
         <div class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
@@ -41,6 +41,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from '../store';
+import { supabase } from "../supabase/init";
 import axios from "axios";
 import { TrashIcon } from "@heroicons/vue/outline";
 import ProductPreview from '../components/ProductPreview.vue';
@@ -69,15 +70,33 @@ const closePreview = () => {
   store.preview = []
 }
 
-const removeFromSaved = (item) => {
-  store.savedItems.splice(store.savedItems.indexOf(item), 1)
-  console.log(store.savedItems)
-  if (store.savedItems.length === 0) {
-    router.push({ name: 'Catalog', params: { category: "all" } })
-  }
-}
+// const removeFromSaved = (item) => {
+//   store.savedItems.splice(store.savedItems.indexOf(item), 1)
+//   console.log(store.savedItems)
+//   if (store.savedItems.length === 0) {
+//     router.push({ name: 'Catalog', params: { category: "all" } })
+//   }
+// }
 
-onMounted(() => {
-  store.getSavedItems()
-})
+const deleteSavedProduct = async (item) => {
+  // console.log(item.id)
+  try {
+    const { error } = await supabase
+      .from("workouts")
+      .delete()
+      .eq("id", item.id);
+    if (error) throw error;
+    router.push({ name: "Home" });
+  } catch (error) {
+    console.log(error)
+    // errorMsg.value = `Error: ${error.message}`;
+    setTimeout(() => {
+      // errorMsg.value = false;
+    }, 5000);
+  }
+};
+
+// onMounted(() => {
+//   store.getSavedItems()
+// })
 </script>

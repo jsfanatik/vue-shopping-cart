@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useStore } from './store';
 import { supabase } from './supabase/init'
 import Navigation from './components/Navigation.vue'
@@ -64,6 +64,10 @@ supabase.auth.onAuthStateChange((_, session) => {
   console.log('hello')
   store.setUser(session);
   appReady.value = true
+})
+
+onMounted(() => {
+  store.getSavedItems()
 })
 </script>
 

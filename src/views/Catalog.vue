@@ -93,16 +93,25 @@ const closeEmptyModal = () => {
 
 const saveItem = async (item) => {
   console.log(item.description)
-  savedItems.value.push({
-    id: uid(),
-      title: item.title,
-      price: item.price,
-      description: item.description,
-      category: item.category,
-      image: item.image,
-      rating: item.rating
-  })
+  // savedItems.value.push({
+  //   id: uid(),
+  //     title: item.title,
+  //     price: item.price,
+  //     description: item.description,
+  //     category: item.category,
+  //     image: item.image,
+  //     rating: item.rating
+  // })
   try {
+    savedItems.value.push({
+    id: uid(),
+    title: item.title,
+    price: item.price,
+    description: item.description,
+    category: item.category,
+    image: item.image,
+    rating: item.rating
+    })
     await supabase.from("workouts").insert([
       {
       savedItems: savedItems.value
