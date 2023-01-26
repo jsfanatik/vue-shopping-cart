@@ -76,4 +76,8 @@ const removeFromSaved = (item) => {
     router.push({ name: 'Catalog', params: { category: "all" } })
   }
 }
+
+onMounted(() => {
+  store.getSavedItems()
+})
 </script>

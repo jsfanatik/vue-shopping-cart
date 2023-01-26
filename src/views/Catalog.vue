@@ -25,7 +25,8 @@
           <h3 class="mt-4 text-xs text-gray-700">{{ item.title.length > 48 ? item.title.slice(0, 48) + '…' : item.title }}</h3>
           <p class="mt-1 text-md font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
           <div class="absolute bottom-0 right-0">
-            <HeartIcon @click="saveItem(item)" :class="[item.saved === savedItem ? 'text-red-700' : '']" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
+            <HeartIcon @click="saveItem(item)" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
+            <!-- <input type="checkbox" :value="item" v-model="store.savedItems" class="w-4 h-4"> -->
           </div>
         </div>
       </div>
@@ -43,12 +44,15 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { uid } from "uid";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from '../store';
+import { supabase } from "../supabase/init";
 import ProductPreview from '../components/ProductPreview.vue';
 import CartEmpty from '../components/CartEmptyDialog.vue'
 import { HeartIcon } from "@heroicons/vue/outline";
 import { stringifyExpression } from '@vue/compiler-core';
+import { Switch } from '@headlessui/vue'
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -61,9 +65,11 @@ const store = useStore()
 const isPreviewOpen = ref(false)
 const isEmptyOpen = ref(false)
 const isEmptyMessage = ref("")
-const newArray = ref([])
-const savedItem = ref()
+const savedItem = ref(false)
+const savedItems = ref([])
+const data = ref(null)
 // const isActive = ref(false)
+// const enabled = ref(false)
 
 const emit = defineEmits(['update', 'updateSubTotal'])
 
@@ -85,33 +91,62 @@ const closeEmptyModal = () => {
   isEmptyOpen.value = false
 }
 
-const saveItem = (item) => {
-
-  const allItems = []
-
-  allItems.push(item)
-
-  // prevents duplicate items in store.savedItems
-  allItems.forEach((val) => {
-    if(!store.savedItems.find(e => e.title === val.title)) {
-      val.saved = true
-      store.savedItems.unshift(val)
-    } else {
-      isEmptyMessage.value = "You Already Saved this Item!"
-      openEmptyModal()
-    }
+const saveItem = async (item) => {
+  console.log(item.description)
+  savedItems.value.push({
+    id: uid(),
+      title: item.title,
+      price: item.price,
+      description: item.description,
+      category: item.category,
+      image: item.image,
+      rating: item.rating
   })
-  store.storeData.find(f => f.title === item.title).saved = true
-
-  savedItem.value = store.savedItems.find(f => f.title === item.title).saved
-
-  store.isSaved = savedItem.value
-  console.log(store.isSaved)
-  // console.log(store.storeData.find(f => f.title === item.title).saved)
+  try {
+    await supabase.from("workouts").insert([
+      {
+      savedItems: savedItems.value
+    }
+  ]);
+  } catch(error) {
+    console.log(error)
+  }
 }
 
+const getData = async () => {
+  try {
+    const { data: workouts, error } = await supabase
+      .from("workouts")
+      .select("*")
+    if (error) throw error;
+    data.value = workouts;
+    console.log(data.value)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// const saveItem = async (item) => {
+
+//   const allItems = []
+
+//   allItems.push(item)
+
+//   // prevents duplicate items in store.savedItems
+//   allItems.forEach((val) => {
+//     if(!store.savedItems.find(e => e.title === val.title)) {
+//       val.saved = true
+//       // store.savedItems.unshift(val)
+//     } else {
+//       isEmptyMessage.value = "You Already Saved this Item!"
+//       openEmptyModal()
+//     }
+//   })
+// }
+
 onMounted(() => {
-  savedItem.value = store.isSaved
+  getData()
+  // savedItem.value = store.isSaved
   // console.log(savedItem.value)
 })
 </script>
