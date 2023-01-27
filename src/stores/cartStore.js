@@ -5,11 +5,11 @@ import { supabase } from "../supabase/init";
 export const useCartStore = defineStore({
   id: 'cart',
   state: () => ({
-    // checkBoxItems: [],
     cartItems: [],
     subTotal: 0.00,
   }),
   actions: {
+    // retrieve cart items from Supabase database
     async getCartItems() {
       const { data: cartItems, error } = await supabase.from("cartItems").select("*");
       this.cartItems = [...cartItems]
@@ -27,13 +27,10 @@ export const useCartStore = defineStore({
         (accumulator, currentValue) => accumulator + currentValue,
         initialValue
       );
-      // console.log(this.subTotal)
     },
     // calculates total value after item is removed from cart
     subtractValue(productPrice) {
-      // console.log(productPrice)
       const initialValue = this.subTotal;
-      // console.log(initialValue)
       this.subTotal = productPrice.reduce(
         (accumulator, currentValue) => accumulator - currentValue,
         initialValue

@@ -6,10 +6,8 @@ export const useAllProductsStore = defineStore({
   id: 'products',
   state: () => ({
     category: "",
-    // checkBoxItems: [],
     storeData: [],
     preview: [],
-    // subTotal: 0.00,
     loading: false
   }),
   getters: {
