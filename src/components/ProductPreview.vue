@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref, toRefs } from 'vue'
+import { supabase } from "../supabase/init";
 import { useAllProductsStore } from '../stores/allProductsStore';
 import { useCartStore } from '../stores/cartStore';
 import {
@@ -164,15 +165,23 @@ const close = () => {
   emit('closePreview')
 }
 
-const addToCart = () => {
-  cartStore.cartItems.push(store.preview)
-
-  const storedObjects = cartStore.cartItems.map(elm => {
-    return elm.price
-  })
-
-  cartStore.sumValue(storedObjects)
-
+const addToCart = async () => {
+  try {
+    // push properties from store.preview to "cartItems" in Supabase
+    await supabase.from("cartItems").insert([
+      { 
+        title: store.preview.title,
+        price: store.preview.price,
+        description: store.preview.description,
+        category: store.preview.category,
+        image: store.preview.image
+      }
+    ]);
+    await cartStore.getCartItems()
+    cartStore.sumValue()
+  } catch(error) {
+    console.log(error)
+  }
   emit('closePreview')
 }
 </script>

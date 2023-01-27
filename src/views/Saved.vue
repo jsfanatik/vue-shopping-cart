@@ -55,10 +55,7 @@ const router = useRouter()
 const route = useRoute()
 const allProductsStore = useAllProductsStore()
 const savedItemsStore = useSavedItemsStore()
-const subTotal = ref()
 const isPreviewOpen = ref(false)
-
-const emit = defineEmits(['update', 'updateSubTotal'])
 
 const openPreview = (item) => {
   isPreviewOpen.value = true
@@ -70,8 +67,14 @@ const closePreview = () => {
   allProductsStore.preview = []
 }
 
+watch(savedItemsStore, () => {
+  console.log('savedItems === 0')
+  if (savedItemsStore.savedItems < 1) {
+    router.push({ name: 'Catalog', params: { category: 'all' } })
+  }
+})
+
 onMounted(() => {
   savedItemsStore.getSavedItems()
-  console.log(savedItemsStore.savedItems)
 })
 </script>

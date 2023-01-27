@@ -35,7 +35,7 @@
                               </div>
                               <div class="flex flex-1 items-end justify-between text-sm">
                                 <div class="flex">
-                                  <button @click="removeFromCart(product)" type="button" class="font-medium text-indigo-600 hover:text-indigo-500">Remove</button>
+                                  <button @click="deleteCartItem(product)" type="button" class="font-medium text-indigo-600 hover:text-indigo-500">Remove</button>
                                 </div>
                               </div>
                             </div>
@@ -76,7 +76,7 @@
 
 <script setup>
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
-import { useAllProductsStore } from '../stores/allProductsStore';
+import { supabase } from "../supabase/init";
 import { useCartStore } from '../stores/cartStore';
 import {
   TransitionRoot,
@@ -111,8 +111,19 @@ watch(cartStore, () => {
   }
 })
 
-const removeFromCart = (product) => {
-  cartStore.cartItems.splice(cartStore.cartItems.indexOf(product), 1)
-  cartStore.subtractValue([product.price])
+const deleteCartItem = async (item) => {
+  try {
+    const { error } = await supabase
+    .from("cartItems")
+    .delete()
+    .eq("id", item.id);
+    await cartStore.getCartItems()
+    cartStore.subtractValue([item.price])
+    if (error) throw error;
+  } catch (error) {
+    console.log(error)
+    setTimeout(() => {
+    }, 5000);
+  }
 }
 </script>

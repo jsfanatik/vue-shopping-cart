@@ -32,12 +32,6 @@
       </div>
     </div>
 
-    <CartEmpty 
-    @closeEmptyModal="closeEmptyModal" 
-    :isEmptyOpen="isEmptyOpen" 
-    :isEmptyMessage="isEmptyMessage"
-  />
-
     <ProductPreview :isPreviewOpen="isPreviewOpen" @closePreview="closePreview" />
   </div>
 </template>
@@ -65,13 +59,6 @@ const route = useRoute()
 const allProductsStore = useAllProductsStore()
 const savedItemsStore = useSavedItemsStore()
 const isPreviewOpen = ref(false)
-const isEmptyOpen = ref(false)
-const isEmptyMessage = ref("")
-const savedItem = ref(false)
-const savedItems = ref([])
-const data = ref(null)
-
-const emit = defineEmits(['update', 'updateSubTotal'])
 
 const openPreview = (item) => {
   isPreviewOpen.value = true
@@ -83,28 +70,19 @@ const closePreview = () => {
   allProductsStore.preview = []
 }
 
-const openEmptyModal = () => {
-  isEmptyOpen.value = true
-}
-
-const closeEmptyModal = () => {
-  isEmptyOpen.value = false
-}
-
 const saveItem = async (item) => {
-  savedItems.value.push({
-    id: uid(),
-    title: item.title,
-    price: item.price,
-    description: item.description,
-    category: item.category,
-    image: item.image,
-    rating: item.rating
-  })
   try {
-    await supabase.from("savedItems").insert([{ savedItems: savedItems.value }]);
+    await supabase.from("savedItems").insert([
+      { 
+        uid: uid(),
+        title: item.title,
+        price: item.price,
+        description: item.description,
+        category: item.category,
+        image: item.image
+      }
+    ]);
     savedItemsStore.getSavedItems()
-    savedItems.value = []
   } catch(error) {
     console.log(error)
   }

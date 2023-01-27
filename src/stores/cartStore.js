@@ -10,19 +10,30 @@ export const useCartStore = defineStore({
     subTotal: 0.00,
   }),
   actions: {
+    async getCartItems() {
+      const { data: cartItems, error } = await supabase.from("cartItems").select("*");
+      this.cartItems = [...cartItems]
+    },
     // calculates total value in cart
-    sumValue(storedObjects) {
+    async sumValue() {
+      // call getCartItems() to repopulate this.cartItems
+      await this.getCartItems()
+      // create new array with price properties from cartItems
+      const storedObjects = this.cartItems.map(elm => {
+        return elm.price
+      })
       const initialValue = 0;
       this.subTotal = storedObjects.reduce(
         (accumulator, currentValue) => accumulator + currentValue,
         initialValue
       );
+      // console.log(this.subTotal)
     },
     // calculates total value after item is removed from cart
     subtractValue(productPrice) {
-      console.log(productPrice)
+      // console.log(productPrice)
       const initialValue = this.subTotal;
-      console.log(initialValue)
+      // console.log(initialValue)
       this.subTotal = productPrice.reduce(
         (accumulator, currentValue) => accumulator - currentValue,
         initialValue
