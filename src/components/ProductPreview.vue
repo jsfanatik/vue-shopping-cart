@@ -1,17 +1,3 @@
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
--->
 <template>
   <TransitionRoot as="template" :show="isPreviewOpen">
     <Dialog as="div" class="relative z-10" @close="close">
@@ -57,7 +43,7 @@
                     <section aria-labelledby="options-heading" class="mt-10">
                       <h3 id="options-heading" class="sr-only">Product options</h3>
 
-                      <form>
+                      <form @click.prevent="addToCart">
                         <!-- Colors -->
                         <div>
                           <h4 class="text-sm font-medium text-gray-900">Color</h4>
@@ -100,7 +86,7 @@
                           </RadioGroup>
                         </div>
 
-                        <button type="submit" @click="addToCart" class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to cart</button>
+                        <button type="submit" class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Add to cart</button>
                       </form>
                     </section>
                   </div>
@@ -116,7 +102,8 @@
 
 <script setup>
 import { ref, toRefs } from 'vue'
-import { useStore } from '../store';
+import { useAllProductsStore } from '../stores/allProductsStore';
+import { useCartStore } from '../stores/cartStore';
 import {
   Dialog,
   DialogPanel,
@@ -134,7 +121,8 @@ const formatter = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 
-const store = useStore()
+const store = useAllProductsStore()
+const cartStore = useCartStore()
 
 const product = {
   name: 'Basic Tee 6-Pack ',
@@ -177,12 +165,14 @@ const close = () => {
 }
 
 const addToCart = () => {
-  store.checkBoxItems.push(store.preview)
+  cartStore.cartItems.push(store.preview)
 
-  const storedObjects = store.checkBoxItems.map(elm => {
+  const storedObjects = cartStore.cartItems.map(elm => {
     return elm.price
   })
 
-  store.sumValue(storedObjects)
+  cartStore.sumValue(storedObjects)
+
+  emit('closePreview')
 }
 </script>

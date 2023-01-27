@@ -19,7 +19,7 @@
                     <div class="mt-8">
                       <div class="flow-root">
                         <ul role="list" class="-my-6 divide-y divide-gray-200">
-                          <li v-for="product in store.checkBoxItems" :key="product.id" class="flex py-6">
+                          <li v-for="product in cartStore.cartItems" :key="product.id" class="flex py-6">
                             <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                               <img :src="product.image" class="h-full w-full object-cover object-center" />
                             </div>
@@ -48,7 +48,7 @@
                   <div class="border-t border-gray-200 py-6 px-4 sm:px-6">
                     <div class="flex justify-between text-base font-medium text-gray-900">
                       <p>Subtotal</p>
-                      <p>{{ formatter.format(store.subTotal) }}</p>
+                      <p>{{ formatter.format(cartStore.subTotal) }}</p>
                     </div>
                     <p class="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                     <div class="mt-6">
@@ -76,7 +76,8 @@
 
 <script setup>
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
-import { useStore } from '../store';
+import { useAllProductsStore } from '../stores/allProductsStore';
+import { useCartStore } from '../stores/cartStore';
 import {
   TransitionRoot,
   TransitionChild,
@@ -86,7 +87,8 @@ import {
 } from '@headlessui/vue'
 import { XCircleIcon } from "@heroicons/vue/outline";
 
-const store = useStore()
+const cartStore = useCartStore()
+
 const props = defineProps({
   isOpen: Boolean,
 })
@@ -103,14 +105,14 @@ const closeModal = () => {
   emit('closeModal')
 }
 
-watch(store, () => {
-  if (store.checkBoxItems.length === 0) {
+watch(cartStore, () => {
+  if (cartStore.cartItems.length === 0) {
     emit('closeModal')
   }
 })
 
 const removeFromCart = (product) => {
-  store.checkBoxItems.splice(store.checkBoxItems.indexOf(product), 1)
-  store.subtractValue([product.price])
+  cartStore.cartItems.splice(cartStore.cartItems.indexOf(product), 1)
+  cartStore.subtractValue([product.price])
 }
 </script>
