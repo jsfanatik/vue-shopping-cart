@@ -26,11 +26,11 @@
               <span @click="logout" class="ml-2 text-xl text-black text-md">Logout</span>
           </div>
         </div>
-        <div v-if="!user">
+        <!-- <div v-if="!user">
           <div class="flex">
             <router-link class="cursor-pointer text-black text-xl" :to="{name: 'Login'}">Login</router-link>
           </div>
-        </div>
+        </div> -->
       </div>
       
     </div>
