@@ -17,16 +17,16 @@
 
   <div v-else class="mx-auto max-w-2xl py-16 px-4 sm:py-12 sm:px-6 lg:max-w-7xl lg:px-8">
     <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-      <div v-for="(item, idx) in allProductsStore.storeData" :key="idx" class="group relative shadow-xl bg-gray-200 p-4 rounded-md">
+      <div v-for="item in allProductsStore.storeData" :key="item.id" class="group relative shadow-xl bg-gray-200 p-4 rounded-md">
         <div class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
           <img :src="item.image" @click="openPreview(item)" class="h-full w-full object-cover object-center lg:h-full lg:w-full hover:cursor-pointer" />
         </div>
         <div class="relative">
           <h3 class="mt-4 text-xs text-gray-700">{{ item.title.length > 48 ? item.title.slice(0, 48) + '…' : item.title }}</h3>
           <p class="mt-1 text-md font-medium text-gray-900">{{ formatter.format(item.price) }}</p>
-          <div class="absolute bottom-0 right-0">
-            <HeartIcon @click="saveItem(item)" class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
-            <!-- <input type="checkbox" :value="item" v-model="store.savedItems" class="w-4 h-4"> -->
+          <div @click="saveItem(item)" class="absolute bottom-0 right-0">
+            <HeartIcon class="w-7 h-7 font-bold text-gray-400 hover:cursor-pointer hover:text-indigo-600"/>
+            <!-- <input @change="saveItem(item)" type="checkbox" :value="item" v-model="savedItemsStore.savedItems" class="w-4 h-4"> -->
           </div>
         </div>
       </div>
@@ -37,17 +37,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { uid } from "uid";
 import { useRoute, useRouter } from "vue-router";
 import { useAllProductsStore } from '../stores/allProductsStore';
 import { useSavedItemsStore } from '../stores/savedItemStore';
 import { supabase } from "../supabase/init";
 import ProductPreview from '../components/ProductPreview.vue';
-import CartEmpty from '../components/CartEmptyDialog.vue'
 import { HeartIcon } from "@heroicons/vue/outline";
-import { stringifyExpression } from '@vue/compiler-core';
-import { Switch } from '@headlessui/vue'
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -59,6 +56,8 @@ const route = useRoute()
 const allProductsStore = useAllProductsStore()
 const savedItemsStore = useSavedItemsStore()
 const isPreviewOpen = ref(false)
+const savedItems = ref()
+const isActive = ref(false)
 
 const openPreview = (item) => {
   isPreviewOpen.value = true
@@ -71,6 +70,7 @@ const closePreview = () => {
 }
 
 const saveItem = async (item) => {
+  // console.log(item.title)
   try {
     await supabase.from("savedItems").insert([
       { 
@@ -83,8 +83,13 @@ const saveItem = async (item) => {
       }
     ]);
     savedItemsStore.getSavedItems()
+    console.log(savedItemsStore.savedItems)
   } catch(error) {
     console.log(error)
   }
 }
+
+onMounted(async() => {
+  await savedItemsStore.getSavedItems()
+})
 </script>
