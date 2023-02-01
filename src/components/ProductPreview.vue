@@ -101,10 +101,10 @@
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue'
+import { ref, toRefs, computed } from 'vue'
 import { supabase } from "../supabase/init";
 import { useAllProductsStore } from '../stores/allProductsStore';
-import { useCartStore } from '../stores/cartStore';
+import { useUserStore } from '../stores/userStore';
 import {
   Dialog,
   DialogPanel,
@@ -123,7 +123,7 @@ const formatter = new Intl.NumberFormat('en-US', {
 });
 
 const store = useAllProductsStore()
-const cartStore = useCartStore()
+const userStore = useUserStore()
 
 const product = {
   name: 'Basic Tee 6-Pack ',
@@ -150,6 +150,7 @@ const product = {
   ],
 }
 
+const user = computed(() => userStore.user)
 const open = ref(false)
 const selectedColor = ref(product.colors[0])
 const selectedSize = ref(product.sizes[2])
@@ -174,11 +175,12 @@ const addToCart = async () => {
         price: store.preview.price,
         description: store.preview.description,
         category: store.preview.category,
-        image: store.preview.image
+        image: store.preview.image,
+        email: user.value.email
       }
     ]);
-    await cartStore.getCartItems()
-    cartStore.sumValue()
+    await userStore.getCartItems()
+    userStore.sumValue()
   } catch(error) {
     console.log(error)
   }

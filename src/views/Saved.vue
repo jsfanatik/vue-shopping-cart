@@ -17,9 +17,9 @@
 
   <div v-else class="mx-auto max-w-2xl py-16 px-4 sm:py-12 sm:px-6 lg:max-w-7xl lg:px-8">
     <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
-      <div v-for="item in savedItemsStore.savedItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
+      <div v-for="item in userStore.savedItems" :key="item.id" class="group relative bg-gray-200 shadow-xl p-6 rounded-md">
         <div class="relative pb-4">
-          <TrashIcon @click="savedItemsStore.deleteSavedItem(item)" class="w-6 h-6 hover:cursor-pointer"/>
+          <TrashIcon @click="deleteSavedItem(item)" class="w-6 h-6 hover:cursor-pointer"/>
         </div>
         <div class="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-80">
           <img :src="item.image" @click="openPreview(item)" class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
@@ -40,7 +40,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import { useAllProductsStore } from '../stores/allProductsStore';
-import { useSavedItemsStore } from '../stores/savedItemStore';
+import { useUserStore } from '../stores/userStore';
 import { supabase } from "../supabase/init";
 import axios from "axios";
 import { TrashIcon } from "@heroicons/vue/outline";
@@ -54,7 +54,7 @@ const formatter = new Intl.NumberFormat('en-US', {
 const router = useRouter()
 const route = useRoute()
 const allProductsStore = useAllProductsStore()
-const savedItemsStore = useSavedItemsStore()
+const userStore = useUserStore()
 const isPreviewOpen = ref(false)
 
 const openPreview = (item) => {
@@ -67,14 +67,28 @@ const closePreview = () => {
   allProductsStore.preview = []
 }
 
-watch(savedItemsStore, () => {
-  console.log('savedItems === 0')
-  if (savedItemsStore.savedItems < 1) {
+watch(userStore, () => {
+  if (userStore.savedItems < 1) {
     router.push({ name: 'Catalog', params: { category: 'all' } })
   }
 })
 
+const deleteSavedItem = async (item) => {
+  try {
+    const { error } = await supabase
+      .from("savedItems")
+      .delete()
+      .eq("id", item.id);
+      userStore.getSavedItems()
+    if (error) throw error;
+  } catch (error) {
+    console.log(error)
+    setTimeout(() => {
+    }, 5000);
+  }
+}
+
 onMounted(() => {
-  savedItemsStore.getSavedItems()
+  userStore.getSavedItems()
 })
 </script>

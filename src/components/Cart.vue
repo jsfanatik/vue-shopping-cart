@@ -19,7 +19,7 @@
                     <div class="mt-8">
                       <div class="flow-root">
                         <ul role="list" class="-my-6 divide-y divide-gray-200">
-                          <li v-for="product in cartStore.cartItems" :key="product.id" class="flex py-6">
+                          <li v-for="product in userStore.cartItems" :key="product.id" class="flex py-6">
                             <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                               <img :src="product.image" class="h-full w-full object-cover object-center" />
                             </div>
@@ -48,7 +48,7 @@
                   <div class="border-t border-gray-200 py-6 px-4 sm:px-6">
                     <div class="flex justify-between text-base font-medium text-gray-900">
                       <p>Subtotal</p>
-                      <p>{{ formatter.format(cartStore.subTotal) }}</p>
+                      <p>{{ formatter.format(userStore.subTotal) }}</p>
                     </div>
                     <p class="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                     <div class="mt-6">
@@ -77,7 +77,7 @@
 <script setup>
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
 import { supabase } from "../supabase/init";
-import { useCartStore } from '../stores/cartStore';
+import { useUserStore } from '../stores/userStore';
 import {
   TransitionRoot,
   TransitionChild,
@@ -87,7 +87,7 @@ import {
 } from '@headlessui/vue'
 import { XCircleIcon } from "@heroicons/vue/outline";
 
-const cartStore = useCartStore()
+const userStore = useUserStore()
 
 const props = defineProps({
   isOpen: Boolean,
@@ -105,8 +105,8 @@ const closeModal = () => {
   emit('closeModal')
 }
 
-watch(cartStore, () => {
-  if (cartStore.cartItems.length === 0) {
+watch(userStore, () => {
+  if (userStore.cartItems.length === 0) {
     emit('closeModal')
   }
 })
@@ -117,8 +117,8 @@ const deleteCartItem = async (item) => {
     .from("cartItems")
     .delete()
     .eq("id", item.id);
-    await cartStore.getCartItems()
-    cartStore.subtractValue([item.price])
+    await userStore.getCartItems()
+    userStore.subtractValue([item.price])
     if (error) throw error;
   } catch (error) {
     console.log(error)

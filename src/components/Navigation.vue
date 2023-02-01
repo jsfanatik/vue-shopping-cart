@@ -14,11 +14,12 @@
         </div>
         <div class="hidden md:block">
           <div class="ml-4 flex items-center md:ml-6">
+            <span v-if="user" class="text-gray-200 mr-4">{{ user.email }}</span>
             <button v-if="user" @click="goToSaved" type="button" class="p-1 text-gray-200 hover:text-white">
               <span class="sr-only">View notifications</span>
               <div class="flex">
                 <HeartIcon class="w-6 h-6" :class="[route.name === 'Saved' ? 'text-blue-400' : '']"/>
-                <span class="text-md">({{ savedItemsStore.savedItems.length || '0' }})</span>
+                <span class="text-md">({{ userStore.savedItems.length || '0' }})</span>
               </div>
             </button>
 
@@ -26,7 +27,7 @@
               <span class="sr-only">View notifications</span>
               <div class="flex">
                 <ShoppingCartIcon class="w-6 h-6"/>
-                <span class="text-md">({{ cartStore.cartItems.length || '0' }})</span>
+                <span class="text-md">({{ userStore.cartItems.length || '0' }})</span>
               </div>
             </button>
 
@@ -81,10 +82,10 @@
           <div class="flex-shrink-0">
             <!-- <img class="h-10 w-10 rounded-full" :src="user.imageUrl" alt="" /> -->
           </div>
-          <div class="ml-3">
+          <!-- <div class="ml-3">
             <div class="text-base font-medium leading-none text-white">{{ user.name }}</div>
             <div class="text-sm font-medium leading-none text-gray-400">{{ user.email }}</div>
-          </div>
+          </div> -->
           <button @click="goToSaved" type="button" class="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
             <span class="sr-only">View notifications</span>
             <HeartIcon class="w-6 h-6" :class="[route.name === 'Saved' ? 'text-blue-400' : '']"/>
@@ -109,8 +110,6 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useAllProductsStore } from '../stores/allProductsStore';
-import { useSavedItemsStore } from '../stores/savedItemStore';
-import { useCartStore } from '../stores/cartStore';
 import { useUserStore } from '../stores/userStore';
 import { supabase } from '../supabase/init'
 import { useRoute, useRouter } from "vue-router";
@@ -121,8 +120,6 @@ import CartEmpty from '../components/CartEmptyDialog.vue'
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 
 const store = useAllProductsStore()
-const savedItemsStore = useSavedItemsStore()
-const cartStore = useCartStore()
 const userStore = useUserStore()
 const router = useRouter();
 const route = useRoute()
@@ -136,13 +133,13 @@ const isEmptyMessage = ref("")
 //   imageUrl:
 //     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 // }
-const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
-  { name: 'Calendar', href: '#', current: false },
-  { name: 'Reports', href: '#', current: false },
-]
+// const navigation = [
+//   { name: 'Dashboard', href: '#', current: true },
+//   { name: 'Team', href: '#', current: false },
+//   { name: 'Projects', href: '#', current: false },
+//   { name: 'Calendar', href: '#', current: false },
+//   { name: 'Reports', href: '#', current: false },
+// ]
 const userNavigation = [
   { name: 'Your Profile', href: '#', eventHandler: false },
   { name: 'Settings', href: '#', eventHandler: false },
@@ -160,8 +157,8 @@ const navItems = [
 const user = computed(() => userStore.user)
 
 const logout = async () => {
-    await supabase.auth.signOut()
-    router.push({ name: 'Login' })
+  await supabase.auth.signOut()
+  router.push({ name: 'Login' })
 }
 
 const openModal = () => {
@@ -186,7 +183,7 @@ const getProducts = (item) => {
 
 // open sidebar shopping cart
 const openModals = () => {
-  if (cartStore.cartItems.length > 0) {
+  if (userStore.cartItems.length > 0) {
     openModal()
   } else {
     isEmptyMessage.value = "Your Cart is Empty!"
@@ -196,7 +193,7 @@ const openModals = () => {
 
 // route to saved items
 const goToSaved = () => {
-  if (savedItemsStore.savedItems.length > 0) {
+  if (userStore.savedItems.length > 0) {
     router.push({ name: 'Saved' })
   } else {
     isEmptyMessage.value = "You Have NO Saved Items!"
@@ -212,5 +209,11 @@ watch(route, () => {
   } else {
     store.getProductsByCategory(route.params.category)
   }
+})
+
+watch(user, () => {
+  // console.log(user.value.email)
+  userStore.getCartItems()
+  userStore.getSavedItems()
 })
 </script>

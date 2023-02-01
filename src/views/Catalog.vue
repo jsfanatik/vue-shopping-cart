@@ -40,7 +40,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { uid } from "uid";
 import { useRoute, useRouter } from "vue-router";
 import { useAllProductsStore } from '../stores/allProductsStore';
-import { useSavedItemsStore } from '../stores/savedItemStore';
+import { useUserStore } from '../stores/userStore';
 import { supabase } from "../supabase/init";
 import ProductPreview from '../components/ProductPreview.vue';
 import { HeartIcon } from "@heroicons/vue/outline";
@@ -53,11 +53,13 @@ const formatter = new Intl.NumberFormat('en-US', {
 const router = useRouter()
 const route = useRoute()
 const allProductsStore = useAllProductsStore()
-const savedItemsStore = useSavedItemsStore()
+const userStore = useUserStore()
 const isPreviewOpen = ref(false)
 const isActive = ref(false)
 const titleProperty = ref([])
 const savedItems = ref()
+
+const user = computed(() => userStore.user)
 
 const openPreview = (item) => {
   isPreviewOpen.value = true
@@ -70,9 +72,8 @@ const closePreview = () => {
 }
 
 const saveItem = async (item) => {
-  console.log(item)
   try {
-    if (!savedItemsStore.savedItems.find(e => e.title === item.title)) {
+    if (!userStore.savedItems.find(e => e.title === item.title)) {
       await supabase.from("savedItems").insert([
         { 
           uid: uid(),
@@ -80,29 +81,30 @@ const saveItem = async (item) => {
           price: item.price,
           description: item.description,
           category: item.category,
-          image: item.image
+          image: item.image,
+          email: user.value.email
         }
       ]);
     }
-    savedItemsStore.getSavedItems()
+    userStore.getSavedItems()
   } catch(error) {
     console.log(error)
   }
 }
 
-watch(savedItemsStore, () => {
+watch(userStore, () => {
   setHeartsToActive()
 })
 
 const setHeartsToActive = () => {
-  const newObject = savedItemsStore.savedItems.map(elm => {
+  const newObject = userStore.savedItems.map(elm => {
     return elm.title
   })
   titleProperty.value = [...Object.values(newObject)]
 }
 
 onMounted(async() => {
-  await savedItemsStore.getSavedItems()
+  await userStore.getSavedItems()
   setHeartsToActive()
 })
 </script>
