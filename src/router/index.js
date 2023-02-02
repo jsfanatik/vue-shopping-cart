@@ -4,6 +4,7 @@ import Login from "../views/Login.vue"
 import Register from "../views/Register.vue"
 import Catalog from "../views/Catalog.vue";
 import Saved from "../views/Saved.vue";
+import Checkout from "../views/Checkout.vue"
 
 const routes = [
   {
@@ -39,6 +40,15 @@ const routes = [
     component: Saved,
     meta: {
       title: "Saved",
+      auth: true,
+    },
+  },
+  {
+    path: "/checkout",
+    name: "Checkout",
+    component: Checkout,
+    meta: {
+      title: "Checkout",
       auth: true,
     },
   },
