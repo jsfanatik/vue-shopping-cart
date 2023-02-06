@@ -1,36 +1,4 @@
 <template>
-  <!-- <div class="max-w-screen-sm mx-auto px-4 py-10">
-
-    <div v-if="errorMsg" class="mb-10 p-4 rounded-md bg-light-grey shadow-lg">
-      <p class="text-red-500">{{ errorMsg }}</p>
-    </div>
-
-    <form @submit.prevent="login" class="p-8 flex flex-col bg-light-grey rounded-md shadow-lg">
-      <h1 class="text-3xl text-at-light-green mb-4">Login</h1>
-      <div class="flex flex-col mb-2">
-        <label for="email" class="mb-1 text-sm text-at-light-green">Email</label>
-        <input
-        v-model="email" 
-        type="text" 
-        required class="p-2 text text-gray-500 focus:outline-none" 
-        id="email">
-      </div>
-
-      <div class="flex flex-col mb-2">
-        <label for="password" class="mb-1 text-sm text-at-light-green">Password</label>
-        <input
-        v-model="password" 
-        type="password" 
-        required class="p-2 text text-gray-500 focus:outline-none" 
-        id="password">
-      </div>
-
-      <button type="submit" class="mt-6 py-2 px-6 rounded-md self-start text-sm text-white bg-blue-400 duration-200 border-solid border-2 border-transparent hover:border-at-light-green hover:bg-white hover:text-at-light-green">Login</button>
-    
-      <router-link class="text-sm mt-6 text-center" :to="{ name: 'Register' }">Don't have an account? <span class="text-at-light-green">Register</span></router-link>
-    </form>
-  </div> -->
-
   <div class="flex min-h-full items-center justify-center py-36 px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8 rounded-lg border-solid border-2 p-12 border-indigo-600">
       <div>
@@ -64,7 +32,6 @@
           <div class="text-sm">
             <!-- <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Forgot your password?</a> -->
             <router-link class="font-medium text-indigo-600 hover:text-indigo-500" :to="{ name: 'Register' }">Need an account?</router-link>
-
           </div>
         </div>
 
@@ -78,39 +45,31 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue"
 import { supabase } from '../supabase/init'
 import { useRouter } from 'vue-router'
 
-export default {
-  name: "login",
-  setup() {
-    // Create data / vars
-    const router = useRouter()
-    const email = ref(null)
-    const password = ref(null)
-    const errorMsg = ref(null)
+// Create data / vars
+const router = useRouter()
+const email = ref(null)
+const password = ref(null)
+const errorMsg = ref(null)
 
-    // Login function
-    const login = async () => {
-      try {
-        const {error} = await supabase.auth.signIn({
-          email: email.value,
-          password: password.value
-        })
-        if(error) throw error;
-        // router.push({ name: "Home" })
-        router.push({ name: 'Catalog', params: { category: 'all' } })
-      } catch(error) {
-        errorMsg.value = `Error: ${error.message}`
-        setTimeout(() => {
-          errorMsg.value = null
-        }, 5000)
-      }
-    }
-
-    return { email, password, errorMsg, login };
-  },
-};
+// Login function
+const login = async () => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.value,
+      password: password.value
+    })
+    if(error) throw error;
+    router.push({ name: 'Catalog', params: { category: 'all' } })
+  } catch(error) {
+    errorMsg.value = `Error: ${error.message}`
+    setTimeout(() => {
+      errorMsg.value = null
+    }, 5000)
+  }
+}
 </script>

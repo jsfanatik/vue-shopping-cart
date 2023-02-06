@@ -119,6 +119,7 @@ import CartEmpty from '../components/CartEmptyDialog.vue'
 
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 
+// const user = supabase.auth.getSession()
 const store = useAllProductsStore()
 const userStore = useUserStore()
 const router = useRouter();

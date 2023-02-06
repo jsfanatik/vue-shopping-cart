@@ -23,6 +23,7 @@ export const useUserStore = defineStore({
           const cartArray = cartItems.filter(item => item.email === this.user.email)
           this.cartItems = [...cartArray]
         }
+        await this.sumValue()
       } catch(error) {
         console.warn(error.message)
       }
@@ -41,7 +42,7 @@ export const useUserStore = defineStore({
     },
     async sumValue() {
       // call getCartItems() to repopulate this.cartItems
-      await this.getCartItems()
+      // await this.getCartItems()
       // create new array with price properties from cartItems
       const storedObjects = this.cartItems.map(elm => {
         return elm.price

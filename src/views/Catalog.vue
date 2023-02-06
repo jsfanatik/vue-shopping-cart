@@ -104,6 +104,7 @@ const setHeartsToActive = () => {
 }
 
 onMounted(async() => {
+  console.log(user.value)
   await userStore.getSavedItems()
   setHeartsToActive()
 })

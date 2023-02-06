@@ -29,8 +29,8 @@
 
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-            <label for="remember-me" class="ml-2 block text-sm text-gray-900">Remember me</label>
+            <input id="vendor" name="vendor" v-model="isVendor" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+            <label for="vendor" class="ml-2 block text-sm text-gray-900">Register as a vendor?</label>
           </div>
 
           <div class="text-sm">
@@ -49,47 +49,50 @@
   </div>
 </template>
   
-<script>
-import { ref } from "vue"
+<script setup>
+import { ref, watch } from "vue"
 import { supabase } from '../supabase/init'
 import { useRouter } from 'vue-router'
 
-export default {
-  name: "register",
-  setup() {
-    // Create data / vars
-    const router = useRouter();
-    const email = ref(null)
-    const password = ref(null)
-    const confirmPassword = ref(null)
-    const errorMsg = ref(null)
-    // Register function
-  
-    const register = async () => {
-      if (password.value === confirmPassword.value) {
-        try {
-          const { error } = await supabase.auth.signUp({
-            email: email.value,
-            password: password.value
-          })
-          if (error) throw error;
-          router.push({name: 'Login'})
-        } catch(error) {
-            errorMsg.value = error.message;
-            setTimeout(() => {
-              errorMsg.value = null
-            }, 5000)
-        }
-        return;
-      }
-      errorMsg.value = "Error: Passwords do not match"
-      setTimeout(() => {
-        errorMsg.value = null
-      }, 5000)
-    }
+// Create data / vars
+const router = useRouter();
+const email = ref(null)
+const password = ref(null)
+const confirmPassword = ref(null)
+const errorMsg = ref(null)
+const isVendor = ref(false)
 
-    return { email, password, confirmPassword, errorMsg, register };
-  },
-};
+watch(isVendor, () => {
+  console.log(isVendor.value)
+})
+
+// Register function
+const register = async () => {
+  if (password.value === confirmPassword.value) {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: email.value,
+        password: password.value,
+        options: {
+          data: {
+            isVendor: isVendor.value
+          }
+        }
+      })
+      if (error) throw error;
+      router.push({name: 'Login'})
+    } catch(error) {
+        errorMsg.value = error.message;
+        setTimeout(() => {
+          errorMsg.value = null
+        }, 5000)
+    }
+    return;
+  }
+  errorMsg.value = "Error: Passwords do not match"
+  setTimeout(() => {
+    errorMsg.value = null
+  }, 5000)
+}
 </script>
   
