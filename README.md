@@ -1,6 +1,6 @@
 # Vue 3 Supabase Shopping Cart
 
-<img width="800" alt="Screen Shot 2022-10-01 at 3 02 30 PM" src="https://github.com/jsfanatik/vue-vite-weather/blob/main/src/assets/city-warm.png">
+<img width="800" alt="Screen Shot 2022-10-01 at 3 02 30 PM" src="https://github.com/jsfanatik/vue-shopping-cart/blob/master/src/assets/Screen%20Shot%202023-02-09%20at%209.36.59%20PM.png">
 
 <img width="800" alt="Screen Shot 2022-10-01 at 3 02 30 PM" src="https://github.com/jsfanatik/vue-vite-weather/blob/main/src/assets/city-warm.png">
 
