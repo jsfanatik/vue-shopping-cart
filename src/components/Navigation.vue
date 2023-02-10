@@ -14,7 +14,7 @@
         </div>
         <div class="hidden md:block">
           <div class="ml-4 flex items-center md:ml-6">
-            <span v-if="user" class="text-gray-200 mr-4">{{ user.email }}</span>
+            <!-- <span v-if="user" class="text-gray-200 mr-4">{{ user.email }}</span> -->
             <button v-if="user" @click="goToSaved" type="button" class="p-1 text-gray-200 hover:text-white">
               <span class="sr-only">View notifications</span>
               <div class="flex">
